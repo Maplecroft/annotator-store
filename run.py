@@ -62,6 +62,9 @@ def main(argv):
     if app.config.get('AUTHZ_ON') is not None:
         es.authorization_enabled = app.config['AUTHZ_ON']
 
+    if app.config.get('DEBUG') is not None:
+        app.debug = app.config['DEBUG']
+
     with app.test_request_context():
         try:
             annotation.Annotation.create_all()
