@@ -18,11 +18,11 @@ import logging
 import sys
 import time
 
-from flask import Flask, g, current_app, request
+from flask import Flask, g, request
 import elasticsearch
 from annotator import es, annotation, auth, authz, document, store
-from tests.helpers import MockUser, MockConsumer, MockAuthenticator
-from tests.helpers import mock_authorizer
+from tests.helpers import MockUser
+
 
 logging.basicConfig(format='%(asctime)s %(process)d %(name)s [%(levelname)s] '
                            '%(message)s',
