@@ -18,7 +18,7 @@ import logging
 import sys
 import time
 
-from flask import Flask, g, current_app
+from flask import Flask, g, current_app, request
 import elasticsearch
 from annotator import es, annotation, auth, authz, document, store
 from tests.helpers import MockUser, MockConsumer, MockAuthenticator
@@ -83,29 +83,16 @@ def main(argv):
 
     @app.before_request
     def before_request():
-        # In a real app, the current user and consumer would be determined by
-        # a lookup in either the session or the request headers, as described
-        # in the Annotator authentication documentation[1].
-        #
-        # [1]: https://github.com/okfn/annotator/wiki/Authentication
-        g.user = MockUser('alice')
+        userid = None
 
-        # By default, this test application won't do full-on authentication
-        # tests. Set AUTH_ON to True in the config file to enable (limited)
-        # authentication testing.
-        if current_app.config['AUTH_ON']:
-            g.auth = auth.Authenticator(lambda x: MockConsumer('annotateit'))
-        else:
-            g.auth = MockAuthenticator()
+        if request.json:
+            userid = request.json.get('user')
 
-        # Similarly, this test application won't prevent you from modifying
-        # annotations you don't own, deleting annotations you're disallowed
-        # from deleting, etc. Set AUTHZ_ON to True in the config file to
-        # enable authorization testing.
-        if current_app.config['AUTHZ_ON']:
-            g.authorize = authz.authorize
-        else:
-            g.authorize = mock_authorizer
+        g.user = MockUser(userid=userid)
+
+        g.auth = auth.Authenticator(lambda x: g.user)
+
+        g.authorize = authz.authorize
 
     app.register_blueprint(store.store)
 
