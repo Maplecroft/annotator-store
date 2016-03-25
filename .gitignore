@@ -1,4 +1,4 @@
 .idea
 *.egg-info/
 *.pyc
-annotator.cfg
+settings.py
