@@ -2,12 +2,12 @@
 """
 
 import logging
+import os
 
-import elasticsearch
 import flask
 
 import settings
-from annotator import annotation, auth, authz, document, es, store
+from annotator import auth, authz, es, store
 from tests import helpers
 
 # Elastic Search
@@ -32,16 +32,6 @@ app.debug = settings.DEBUG
 
 app.register_blueprint(store.store)
 
-with app.test_request_context():
-    try:
-        annotation.Annotation.create_all()
-        document.Document.create_all()
-    except elasticsearch.exceptions.RequestError as e:
-        if e.error.startswith('MergeMappingException'):
-            log.fatal('Please reindex Elastic Search')
-
-        raise
-
 
 @app.before_request
 def before_request():
@@ -58,7 +48,6 @@ def before_request():
 
 
 if __name__ == '__main__':
-    app.run(
-        host=settings.ANNOTATOR_STORE_HOST,
-        port=settings.ANNOTATOR_STORE_PORT,
-    )
+    host = os.environ.get('HOST', '127.0.0.1')
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host=host, port=port)
