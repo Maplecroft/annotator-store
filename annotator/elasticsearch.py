@@ -52,6 +52,9 @@ class ElasticSearch(object):
 
         if parsed.path:
             connargs['url_prefix'] = parsed.path
+            
+        if parsed.scheme == 'https':
+            connargs['use_ssl'] = True
 
         conn = elasticsearch.Elasticsearch(
             hosts=[connargs],
