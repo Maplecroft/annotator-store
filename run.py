@@ -8,7 +8,6 @@ import flask
 
 import settings
 from annotator import auth, authz, es, store
-from tests import helpers
 
 # Elastic Search
 # ------------------------------------------------------------------------------
@@ -33,17 +32,19 @@ app.debug = settings.DEBUG
 app.register_blueprint(store.store)
 
 
+class Authenticator(object):
+    def request_user(self, request):
+        userid = None
+
+        if request.json:
+            userid = request.json.get('user', userid)
+
+        return auth.User(userid, auth.Consumer('key'), False)
+
+
 @app.before_request
 def before_request():
-    # We defer to nginx for authentication and authorization. Consequently,
-    # we trust the JSON that's in the request.
-    userid = None
-
-    if flask.request.json:
-        userid = flask.request.json.get('user', userid)
-
-    flask.g.user = helpers.MockUser(userid=userid)
-    flask.g.auth = auth.Authenticator(flask.g.user)
+    flask.g.auth = Authenticator()
     flask.g.authorize = authz.authorize
 
 
