@@ -7,7 +7,7 @@ import os
 import flask
 
 import settings
-from annotator import auth, authz, es, store
+from annotator import annotation, auth, authz, document, es, store
 
 # Elastic Search
 # ------------------------------------------------------------------------------
@@ -44,6 +44,9 @@ class Authenticator(object):
 
 @app.before_request
 def before_request():
+    annotation.Annotation.create_all()
+    document.Document.create_all()
+
     flask.g.auth = Authenticator()
     flask.g.authorize = authz.authorize
 
