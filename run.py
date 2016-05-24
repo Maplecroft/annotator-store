@@ -44,7 +44,7 @@ def before_request():
 
     flask.g.user = helpers.MockUser(userid=userid)
     flask.g.auth = auth.Authenticator(flask.g.user)
-    flask.g.authz = authz.authorize
+    flask.g.authorize = authz.authorize
 
 
 if __name__ == '__main__':
